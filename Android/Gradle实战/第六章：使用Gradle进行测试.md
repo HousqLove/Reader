@@ -18,3 +18,68 @@
   
  所有的测试框架都会生产至少一个文件用来说明测试执行的结果，最普遍的格式是xml格式，可以在```build/test-results```路径下找到这些文件。许多测试框架都允许把测试结果转换成报告，比如JUnit可以生成html格式的报告，Gradle把测试报告放在```build/report/test```下。如下图：  
  ![Image](https://github.com/HousqLove/Reader/blob/eb20472c21a24e79a44b9f02bfa3ab3311342180/Android/Gradle%E5%AE%9E%E6%88%98/images/gradle-6-1.png)
+### 测试配置
+ Java插件引入可两个配置来声明测试代码的编译期和运行期依赖：```testCompile```和```testRuntime```，如下：  
+```
+	dependencies {
+		testCompile 'junit:junt:4.11'
+	}
+```  
+ testRuntime用来声明那些编译期用不到但运行期需要的依赖。对于测试依赖来讲测试配置继承了源代码相关配置，比如testCompile继承了compile配置的依赖，testRuntime继承了runtime和testCompile和他们的父类，他们父类的依赖会自动传递到testCompile或testRuntime中，如下图：  
+ ![Image](https://github.com/HousqLove/Reader/blob/eb20472c21a24e79a44b9f02bfa3ab3311342180/Android/Gradle%E5%AE%9E%E6%88%98/images/gradle-6-2.png)
+### 测试任务
+ 测试编译和测试执行阶段是在源代码被编译和打包之后的，如果你想避免执行测试阶段你可以在命令行执行gradle jar或者让你的任务依赖jar任务。
+### 自动测试检查
+ 对于```build/classes/test```目录下的所有编译的测试类，Gradle会检查下面几条规则来确认是否要执行。
+
+- 任何继承子junit.framework.TestCase或groovy.util.GroovyTestCase的类
+- 任何被@RunWith注解的子类
+- 任何至少包含一个被@Test注解的类  
+ 如果没有找到符合的，测试就不会执行。
+## 单元测试
+ 为之前的ToDo应用的存储类InMemoryTODORepository.java编写单元测试。  
+ 在```src/test/java```目录下创建一个名叫InMemoryToDoRepositoryTest.java的类，在代码中添加适当的断言。
+```
+	public class InMemoryToDoRepositoryTest {
+		private ToDoRepository inMemoryToDoRepository;
+
+		//用这个注解标识的都会在类的所有测试方法之前执行
+		@Before
+		public void setUp() {
+			inMemoryToDoRepository = new InMemoryToDoRepository();
+		}
+
+		//用这个注解的都会作为测试用例
+		@Test
+		public void insertToDoItem(){
+			ToDoItem new ToDoItem = new ToDoItem();
+			newTODoItem.setName("Write unit tests");
+			Long newId = inMemoryToDoRepository.insert(newToDoItem);
+			//错误的断言会导致测试失败
+			assertNull(newId);
+			ToDoItem persistedToDoItem = inMemoryToDoRepository.findById(newId);
+			assertNotNull(persistedToDoItem);
+			assertEquals(newToDoItem, persistedToDoItem);
+		}
+	}
+```
+ 接下来在依赖配置中添加JUnit的依赖：
+```
+	dependencies {
+		testCompile 'junit:junit:4.11'
+	}
+```
+ 在任务中使用-i选项来打印日志输出：```gradle :repository:test -i```   
+ 在build/report/test查看html的测试报告。
+### 使用testNG
+ 使用testNG的注解标识相应方法，同时还需要做两件事：
+1. 声明对testNG库的依赖
+2. 调用test.useTestNG()方法来声明测试过程中使用testNG框架
+ 如下：  
+```
+	dependencies {
+		testCompile 'org.testng:testng:6.8'
+	}
+	//设置使用testNG来测试
+	test.useTestNG()
+```
