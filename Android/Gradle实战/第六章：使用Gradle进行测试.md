@@ -17,7 +17,7 @@
  默认的项目布局，源代码是```src/main/java```，资源文件是在```src/main/resources```，测试源代码```src/test/java```，资源文件```src/test/resources```，编译之后测试的class文件在```build/classes/test```下。  
   
  所有的测试框架都会生产至少一个文件用来说明测试执行的结果，最普遍的格式是xml格式，可以在```build/test-results```路径下找到这些文件。许多测试框架都允许把测试结果转换成报告，比如JUnit可以生成html格式的报告，Gradle把测试报告放在```build/report/test```下。如下图：  
- ![Image](https://github.com/HousqLove/Reader/blob/eb20472c21a24e79a44b9f02bfa3ab3311342180/Android/Gradle%E5%AE%9E%E6%88%98/images/gradle-6-1.png)
+ ![Image](https://github.com/HousqLove/Reader/blob/master/Android/Gradle%E5%AE%9E%E6%88%98/images/gradle-6-1.png)
 ### 测试配置
  Java插件引入可两个配置来声明测试代码的编译期和运行期依赖：```testCompile```和```testRuntime```，如下：  
 ```
@@ -26,7 +26,7 @@
 	}
 ```  
  testRuntime用来声明那些编译期用不到但运行期需要的依赖。对于测试依赖来讲测试配置继承了源代码相关配置，比如testCompile继承了compile配置的依赖，testRuntime继承了runtime和testCompile和他们的父类，他们父类的依赖会自动传递到testCompile或testRuntime中，如下图：  
- ![Image](https://github.com/HousqLove/Reader/blob/eb20472c21a24e79a44b9f02bfa3ab3311342180/Android/Gradle%E5%AE%9E%E6%88%98/images/gradle-6-2.png)
+ ![Image](https://github.com/HousqLove/Reader/blob/master/Android/Gradle%E5%AE%9E%E6%88%98/images/gradle-6-2.png)
 ### 测试任务
  测试编译和测试执行阶段是在源代码被编译和打包之后的，如果你想避免执行测试阶段你可以在命令行执行gradle jar或者让你的任务依赖jar任务。
 ### 自动测试检查
