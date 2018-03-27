@@ -83,4 +83,56 @@
 - maximumLoad：有效entry和tombstone中的较大者
 - clean：下一个将要clean的位置
 
+```
+	private void initializeTable(int capacity){
+		this.table = new Object[capacity * 2];
+		this.mask = table.length -1;
+		this.clean = 0;
+		this.maximumLoad = capacity * 2 / 3;
+	}
+```
+
+ initializeTable会新生成一个Object类型的数组赋值给table，大小是传尽来参数的2倍。和其他的一些用来管理数组的变量的初始化工作。
+
+```
+	private void inheritValues(Values fromParent){
+		//从父线程的value转换到子线程的values
+		Object[] table = this.table;
+		for(int i = table.length -2; i >= 0; i -= 2){
+			Object k = table[i];
+			if(k== null || k == TOMBSTONE){
+				//跳过
+				continue;
+			}
+			//数组只能包含null，tombstones，references
+			Reference<InheritableThreadLocal<?>> reference = (Reference<InheritableThreadLocal<?>>) k;
+			InheritableThreadLocal key = reference.get();
+			if(key != null){
+				table[i + 1] = key.childValue(fromParent.table[i + 1]);
+			}else{
+				table[i] = TOMBSTONE;//TOMESTONE就是一个Object对象
+				table[i + 1] = null;
+				fromParent.table[i] = TOMESTONE;
+				fromParent.table[i + 1] = null;
+
+				tombstones++;
+				fromParent.tombstones++;
+
+				size--;
+				fromParent.size--;
+			}
+		}
+	}
+```
+ 从代码中可以看出来，table数组在存值的时候是key和value存储在数组相邻的两个地方。从后往前依次访问key和value值，整理数组内的数据，最终整个函数达到所有的数据都有效的目的。
+
+ Values还有其他的一些函数，如cleanup，resize，put，remove等，都是为了维护这个Object数组，并提供方法供ThreadLocal类调用。
+ 
+# 总结
+
+ 至此我们了解到了ThreadLocal里面有一个静态内部类Values，这两个都是纯Java类。Values内部通过Object数组通过在2n位置存Key，2n+1位置存Value的方式保存数据，自动扩展和收缩数组大小，并提供初始化，存取方法供ThreadLocal调用。而TreadLocal类主要是封装Values，并维护Thread内部的数据。
+
+ ThreadLocal里并没有native的函数，也没有特别复杂的逻辑，和刚开始的猜想有点不一样，也可能是因为我是根据android4.4.2在Eclipse反编译下看到的缘故，google对ThreadLocal进行了简化修改吧。总之第一次分析源码，感觉还不错:)
+
+
 
