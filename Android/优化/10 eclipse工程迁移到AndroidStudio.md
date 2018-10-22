@@ -30,7 +30,7 @@
 
  没错，我还在用httpClient，eclipse下的依赖api是4.4.2，迁移到studio 3.0.1之后没有强行改低版本，使用的编译版本是26（8.0），步子迈的大了。
 
- 谷哥在6.0的时候移除了HttpClient的相关类，推荐使用HttpUrlConnection,但是我怎么能轻易就妥协呢，于是在对应module的gradle文件里android配置项内增加```useLirary 'org.apache.http.legacy'```,然后就能愉快的使用HttpClient了。
+ 谷哥在6.0的时候移除了HttpClient的相关类，推荐使用HttpUrlConnection,但是我怎么能轻易就妥协呢，于是在对应module的gradle文件里android配置项内增加```useLibrary 'org.apache.http.legacy'```,然后就能愉快的使用HttpClient了。
 
 ### 问题3：依赖项配置
 
